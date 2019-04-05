@@ -1,0 +1,226 @@
+component :
+
+<div class="row">
+  <div class="col-xs-3 col-xs-offset-3">
+    <label for="file-upload" class="custom-file-upload">
+      <i class="glyphicon glyphicon-open"></i> Import CSV
+    </label>
+    <input id="file-upload" name="fileUpload" type="file" accept=".csv" (change)="importCsvFile($event.target.files)" />
+  </div>
+  <div class="col-xs-3 text-left">
+    <div class="input-group">
+      <span class="input-group-addon" id="basic-addon3">Filter by Issue:</span>
+      <input [disabled]="!tableData" type="number" placeholder="Count" class="form-control" id="basic-url"
+        aria-describedby="basic-addon3" [(ngModel)]="filterCount" (ngModelChange)="applyFilter(filterCount)" />
+    </div>
+  </div>
+</div>
+<br />
+
+<div class="table-responsive" *ngIf="tableData">
+  <table class="table table-hover table-striped table-bordered">
+    <tr>
+      <th *ngFor="let column of columnHeader">{{column}}</th>
+    </tr>
+    <tr *ngFor="let row of tableData">
+      <td>{{row.firstName}}</td>
+      <td>{{row.surName}}</td>
+      <td>{{row.issueCount}}</td>
+      <td>{{row.dateOfBirth}}</td>
+    </tr>
+  </table>
+  <div *ngIf="tableData?.length <= 0" class="text-center"> No data found !!!</div>
+</div>
+
+
+import { Component } from '@angular/core';
+import { Employee } from 'src/app/models/employee';
+
+@Component({
+  selector: 'csv-reader',
+  templateUrl: './csv-reader.component.html'
+})
+export class CsvReaderComponent {
+  dataSource: Employee[];
+  columnHeader: string[] = [];
+  filterCount:number;
+  tableData: Employee[];
+
+/**
+ * 
+ * @param files 
+ */
+  public importCsvFile(files: FileList) {
+    let reader: FileReader = new FileReader();
+    reader.readAsText(files[0]);
+    reader.onload = () => {
+      let csv:any  = reader.result;
+      let allTextLines: string[] = csv.split("\n");
+      if (allTextLines) {
+        this.columnHeader = allTextLines[0].split(',');
+        allTextLines.shift(); allTextLines.pop();
+        let rowdata = [];
+        for (let i = 0; i < allTextLines.length; i++) {
+          let data = allTextLines[i].split(',');
+          if (data) {
+            let employee: Employee = {
+              firstName: data[0],
+              surName: data[1],
+              issueCount: Number(data[2]),
+              dateOfBirth: data[3]
+            }
+            rowdata.push(employee);
+          }
+        }
+       this.tableData =  this.dataSource = rowdata;
+      }
+    }
+  }
+/**
+ * 
+ * @param filterCount 
+ */
+  public applyFilter(filterCount : number) {
+    this.tableData = (filterCount || filterCount === 0 )? this.dataSource.filter(rowdata => rowdata.issueCount === filterCount) : this.dataSource;
+  }
+}
+
+
+
+
+
+
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { CsvReaderComponent } from './csv-reader.component';
+
+fdescribe('CsvReaderComponent', () => {
+  let component: CsvReaderComponent;
+  let fixture: ComponentFixture<CsvReaderComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [FormsModule],
+      declarations: [ CsvReaderComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(CsvReaderComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should not have the table if tabledata is empty', () => {
+    const fileElement = fixture.nativeElement.querySelector('.table-responsive'); 
+    expect(fileElement).toBeNull();
+  });
+
+  it('should call importCsvFile() method when upload the file', () => {
+    const SpyImportCsvFile =  spyOn(component, 'importCsvFile');
+    const fileElement = fixture.nativeElement.querySelector('input[name=fileUpload]');  
+    fileElement.change();
+    expect(SpyImportCsvFile).toHaveBeenCalled();
+  });
+});
+
+
+app..
+
+<!--The content below is only a placeholder and can be replaced.-->
+<div class="container">
+<div class="row">
+  <div class="col-xs-12">
+    <div class="page-header">
+      <h1 class="text-center">CSV File Reader</h1>
+    </div>
+    <csv-reader></csv-reader>
+  </div>
+</div>
+</div>
+
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it(`should have as title`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('CsvFileReader');
+  });
+
+  it('should render title in view', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('h1').textContent).toContain('CSV File Reader');
+  });
+});
+
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AppComponent } from './app.component';
+import { CsvReaderComponent } from './components/csv-reader/csv-reader.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    CsvReaderComponent
+  ],
+  imports: [
+    BrowserModule, FormsModule
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+
+
+angular.js
+"styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles.css"
+            ],
+            
+ package
+            "bootstrap": "3.3.7",
+             
+             
+ index.
+ 
+ <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CsvFileReader</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+
