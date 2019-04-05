@@ -16,16 +16,17 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'FE-assignment'`, () => {
+  it(`should have as title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('FE-assignment');
+    expect(app.title).toEqual('CsvFileReader');
   });
 
-  it('should render title in a h1 tag', () => {
+  it('should render title in view', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to FE-assignment!');
+    expect(compiled.querySelector('h1').textContent).toContain('CSV File Reader');
   });
 });
+

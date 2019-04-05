@@ -1,8 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { MatTableModule} from '@angular/material/table';
+import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
-import { CsvReaderService } from './services/csvreader.service';
 import { CsvReaderComponent } from './components/csv-reader/csv-reader.component';
 
 @NgModule({
@@ -11,9 +10,8 @@ import { CsvReaderComponent } from './components/csv-reader/csv-reader.component
     CsvReaderComponent
   ],
   imports: [
-    BrowserModule, MatTableModule
+    BrowserModule, FormsModule
   ],
-  providers: [CsvReaderService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
