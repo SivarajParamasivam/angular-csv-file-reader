@@ -1,22 +1,25 @@
 <div class="row">
   <div class="col-xs-3 col-xs-offset-3">
-    <label for="file-upload" class="custom-file-upload">
-      <i class="glyphicon glyphicon-open"></i> Import CSV
-    </label>
-    <input id="file-upload" name="fileUpload" type="file" accept=".csv" (change)="importCsvFile($event.target.files)" />
+    <button class="btn btn-default" name="csvUpload">
+      <label for="csv-upload">
+        <i class="glyphicon glyphicon-save"></i> Import CSV
+      </label> 
+      <input id="csv-upload" [ngStyle]="{'display': 'none'}" type="file" accept=".csv" (change)="importCsvFile($event.target.files, $event.target.value)" />
+    </button>
+    <span> &nbsp; {{csvFileName}} </span>
   </div>
   <div class="col-xs-3 text-left">
     <div class="input-group">
       <span class="input-group-addon" id="basic-addon3">Filter by Issue:</span>
-      <input [disabled]="!tableData" type="number" placeholder="Count" class="form-control" id="basic-url"
+      <input [disabled]="!tableData" type="number" placeholder="Count" class="form-control" id="filterCount"
         aria-describedby="basic-addon3" [(ngModel)]="filterCount" (ngModelChange)="applyFilter(filterCount)" />
     </div>
   </div>
 </div>
 <br />
 
-<div class="table-responsive" *ngIf="tableData">
-  <table class="table table-hover table-striped table-bordered">
+<div class="table-responsive">
+  <table *ngIf="tableData" class="table table-hover table-striped table-bordered">
     <tr>
       <th *ngFor="let column of columnHeader">{{column}}</th>
     </tr>
@@ -27,5 +30,5 @@
       <td>{{row.dateOfBirth}}</td>
     </tr>
   </table>
-  <div *ngIf="tableData?.length <= 0" class="text-center"> No data found !!!</div>
+  <div id="nodataFound" *ngIf="tableData && tableData?.length === 0" class="text-center"> {{noDataFound}} </div>
 </div>
