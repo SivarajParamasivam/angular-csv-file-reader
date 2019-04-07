@@ -9,38 +9,46 @@ import { Employee } from 'src/app/models/employee';
 export class CsvReaderComponent {
   dataSource: Employee[];
   columnHeader: string[];
-  // issueCount:number;
   tableData: Employee[];
   csvFileName: string;
   noDataFound= "No data found !!!"; 
 
 /**
- * This method is used to read the CSV file  and  build the  table data.
- * @param files 
+ * This method is used to read the CSV file and build the table data.
+ * @param files
+ * @param fileName
  */
   public importCsvFile(files: FileList, fileName: string) {
     let reader: FileReader = new FileReader();
-    this.csvFileName = fileName?  fileName.split("\\").pop() : "";
+    this.csvFileName = fileName ? fileName.split("\\").pop() : "";
     reader.readAsText(files[0]);
     reader.onload = () => {
-      let csv:any = reader.result;
-      let fileText: string[] = csv.split("\n");
-      if (fileText) {
-        this.columnHeader = fileText.shift().split(','); 
-        let rowdata = [];
-        for (let i = 0; i < fileText.length; i++) {
-          let data = fileText[i].split(',');
-          if (data && data.length) {
-            let employee: Employee = {
-              firstName: data[0],
-              surName: data[1],
-              issueCount: Number(data[2]),
-              dateOfBirth: data[3]
+      if (reader.result) {
+        let csv: string = <string>(reader.result);
+        let fileText: string[] = csv.split("\n");
+        if (fileText) {
+          let rowdata = [];
+          fileText.forEach((rowText, i) => {
+            // regular expression for remove the unwanted double quotes from string
+            let data = rowText.replace(/['"]+/g, '').split(',');
+            if (data && data.length) {
+              if(i === 0) {
+                // to assign table header names from csv file string.
+                this.columnHeader = data;
+              } else {
+                // to build and assign table row values from csv file string.
+                let rowValue: Employee = {
+                  firstName: data[0],
+                  surName: data[1],
+                  issueCount: Number(data[2]),
+                  dateOfBirth: data[3]
+                }
+                rowdata.push(rowValue);
+              }
             }
-            rowdata.push(employee);
-          }
+          });
+          this.tableData = this.dataSource = rowdata;
         }
-       this.tableData =  this.dataSource = rowdata;
       }
     }
     reader.onerror = () => {
